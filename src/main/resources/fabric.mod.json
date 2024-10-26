@@ -1,0 +1,49 @@
+{
+	"schemaVersion": 1,
+	"id": "${id}",
+	"version": "${version}",
+	"name": "${name}",
+	"description": "${description}",
+	"authors": [
+		"Microcontrollers"
+	],
+	"contributors": [
+	],
+	"contact": {
+		"homepage": "${modrinth}",
+		"sources": "${source}",
+		"issues": "${issues}"
+	},
+	"license": "${license}",
+	"icon": "assets/${id}/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.microcontrollers.examplemod.ExampleMod"
+		],
+		"modmenu": [
+			"dev.microcontrollers.examplemod.config.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"${id}.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.7",
+		"minecraft": ">=1.20",
+		"java": ">=17",
+		"fabric-api": "*",
+		"yet_another_config_lib_v3": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.kofi": "${kofi}",
+				"modmenu.discord": "${discord}",
+				"modmenu.modrinth": "${modrinth}",
+				"modmenu.curseforge": "${curseforge}"
+			},
+			"update_checker": true
+		}
+	}
+}
