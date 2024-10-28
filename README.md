@@ -6,4 +6,4 @@ This template is made primarily suited for my own needs, but should be very simp
 
 In terms of buildscript, most of what needs to be changed is in gradle.properties and the root project name in settings.gradle.kts
 
-Don't forget to change the license and some information in the FMJ!
+Don't forget to change the license, some information in the FMJ, and the author field in neoforge.mods.toml!
