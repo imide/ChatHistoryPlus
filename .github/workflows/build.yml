@@ -1,0 +1,35 @@
+# This workflow will automatically build the project with Gradle
+# It will run on every push and submitted PR.
+# Acts as a first line of defense for invalid commits.
+
+name: Build
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java: [ 21 ]
+        os: [ ubuntu-24.04 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
+      - name: setup jdk ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build with gradle
+        uses: Wandalen/wretry.action@master
+        with:
+          command: ./gradlew buildAllVersions --stacktrace
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artifacts
+          path: versions/**/build/libs/*.jar

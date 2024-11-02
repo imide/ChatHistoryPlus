@@ -1,6 +1,10 @@
 plugins {
 	id("dev.architectury.loom") version "1.7.+"
 	id("io.freefair.lombok") version "8.10.2"
+
+	// Publishing
+	`maven-publish`
+	id("me.modmuss50.mod-publish-plugin") version "0.7.+"
 }
 
 class ModData {
@@ -15,6 +19,9 @@ class ModData {
 	val modrinth = property("mod.modrinth")
 	val curseforge = property("mod.curseforge")
 	val kofi = property("mod.kofi")
+	val modrinthId = property("modrinthId").toString()
+	val curseforgeId = property("curseforgeId").toString()
+	val githubProject = property("githubProject").toString()
 }
 
 class Dependencies {
@@ -65,6 +72,10 @@ repositories {
 	maven("https://maven.terraformersmc.com") // Mod Menu
 	maven("https://maven.neoforged.net/releases") // NeoForge
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+
+	// My maven
+	maven("https://maven.imide.xyz/releases")
+	maven("https://maven.imide.xyz/snapshots")
 }
 
 dependencies {
@@ -98,6 +109,7 @@ dependencies {
 }
 
 java {
+	withSourcesJar()
 	val java = if (stonecutter.compare(
 			stonecutter.current.version,
 			"1.20.6"
@@ -107,44 +119,120 @@ java {
 	targetCompatibility = java
 }
 
-tasks.processResources {
-	val props = buildMap {
-		put("id", mod.id)
-		put("name", mod.name)
-		put("version", mod.version)
-		put("mcdep", mc.dep)
-		put("description", mod.description)
-		put("source", mod.source)
-		put("issues", mod.issues)
-		put("license", mod.license)
-		put("modrinth", mod.modrinth)
-		put("curseforge", mod.curseforge)
-		put("kofi", mod.kofi)
-		put("modmenu_version", deps.modmenuVersion)
-		put("yacl_version", deps.yaclVersion)
+tasks {
+	processResources {
+		val props = buildMap {
+			put("id", mod.id)
+			put("name", mod.name)
+			put("version", mod.version)
+			put("mcdep", mc.dep)
+			put("description", mod.description)
+			put("source", mod.source)
+			put("issues", mod.issues)
+			put("license", mod.license)
+			put("modrinth", mod.modrinth)
+			put("curseforge", mod.curseforge)
+			put("kofi", mod.kofi)
+			put("modmenu_version", deps.modmenuVersion)
+			put("yacl_version", deps.yaclVersion)
+
+			if (loader.isNeoforge) {
+				put("forgeConstraint", findProperty("modstoml.forge_constraint"))
+			}
+			if (mc.version == "1.20.1" || mc.version == "1.20.4") {
+				put("forge_id", loader.loader)
+			}
+		}
+
+		props.forEach(inputs::property)
+
+		if (loader.isFabric) {
+			filesMatching("fabric.mod.json") { expand(props) }
+			exclude(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml"))
+		}
 
 		if (loader.isNeoforge) {
-			put("forgeConstraint", findProperty("modstoml.forge_constraint"))
-		}
-		if (mc.version == "1.20.1" || mc.version == "1.20.4") {
-			put("forge_id", loader.loader)
+			if (mc.version == "1.20.4") {
+				filesMatching("META-INF/mods.toml") { expand(props) }
+				exclude("fabric.mod.json", "META-INF/neoforge.mods.toml")
+			} else {
+				filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
+				exclude("fabric.mod.json", "META-INF/mods.toml")
+			}
 		}
 	}
 
-	props.forEach(inputs::property)
+	register("releaseMod") {
+		group = "publishing"
 
-	if (loader.isFabric) {
-		filesMatching("fabric.mod.json") { expand(props) }
-		exclude(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml"))
+		dependsOn("publishMods")
+		dependsOn("publish")
 	}
 
-	if (loader.isNeoforge) {
-		if (mc.version == "1.20.4") {
-			filesMatching("META-INF/mods.toml") { expand(props) }
-			exclude("fabric.mod.json", "META-INF/neoforge.mods.toml")
-		} else {
-			filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
-			exclude("fabric.mod.json", "META-INF/mods.toml")
+	publishMods {
+		displayName.set("${mod.name} version ${mod.version} for ${mc.version}")
+		file.set(remapJar.get().archiveFile)
+		changelog.set(
+			rootProject.file("changelog.md")
+				.takeIf { it.exists() }
+				?.readText()
+				?: "No changelog provided."
+		)
+
+		if (loader.isFabric) modLoaders.add("fabric")
+		if (loader.isNeoforge) modLoaders.add("neoforge")
+
+
+		modrinth {
+			projectId = mod.modrinthId
+			accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+			minecraftVersions.addAll(mc.targets)
+
+			if (loader.isFabric) requires("fabric-api") else null
+			requires("modmenu")
+			requires("yet-another-config-lib")
+		}
+		curseforge {
+			projectId = mod.curseforgeId
+			accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+			minecraftVersions.addAll(mc.targets)
+
+			if (loader.isFabric) requires("fabric-api") else null
+
+			requires("modmenu")
+			requires("yet-another-config-lib")
+
+		}
+
+		github {
+			repository = mod.githubProject
+			accessToken = providers.environmentVariable("GITHUB_TOKEN")
+
+			commitish.set("main")
+		}
+	}
+
+	publishing {
+		publications {
+			create<MavenPublication>("mod") {
+				groupId = mod.group
+				artifactId = mod.id
+			}
+		}
+
+		repositories {
+			val username = providers.environmentVariable("IMIDE_MAVEN_USERNAME")
+			val password = providers.environmentVariable("IMIDE_MAVEN_PASSWORD")
+			if (username.isPresent && password.isPresent) {
+				maven {
+					name = "imide"
+					url = uri("https://maven.imide.xyz/releases")
+					credentials {
+						this.username = username.get()
+						this.password = password.get()
+					}
+				}
+			} else println("No imide maven credentials provided.")
 		}
 	}
 }
@@ -155,7 +243,6 @@ if (stonecutter.current.isActive) {
 		dependsOn(tasks.named("build"))
 	}
 }
-
 @Suppress("TYPE_MISMATCH", "UNRESOLVED_REFERENCE")
 fun <T> optionalProp(property: String, block: (String) -> T?): T? =
 	findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
