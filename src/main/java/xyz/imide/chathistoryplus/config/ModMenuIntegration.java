@@ -1,6 +1,7 @@
-package dev.microcontrollers.examplemod.config;
+package xyz.imide.chathistoryplus.config;
 
 //? if fabric {
+
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import net.fabricmc.api.EnvType;
@@ -10,7 +11,7 @@ import net.fabricmc.api.Environment;
 public class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return ExampleConfig::configScreen;
+        return ChatHistoryPlusConfig::configScreen;
     }
 }
 //?}

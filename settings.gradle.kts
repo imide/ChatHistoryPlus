@@ -38,4 +38,4 @@ extensions.configure<StonecutterSettings> {
 	create(rootProject)
 }
 
-rootProject.name = "ExampleMod"
+rootProject.name = "ChatHistoryPlus"

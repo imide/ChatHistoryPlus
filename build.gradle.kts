@@ -1,5 +1,6 @@
 plugins {
 	id("dev.architectury.loom") version "1.7.+"
+	id("io.freefair.lombok") version "8.10.2"
 }
 
 class ModData {
@@ -14,7 +15,6 @@ class ModData {
 	val modrinth = property("mod.modrinth")
 	val curseforge = property("mod.curseforge")
 	val kofi = property("mod.kofi")
-	val discord = property("mod.discord")
 }
 
 class Dependencies {
@@ -120,7 +120,6 @@ tasks.processResources {
 		put("modrinth", mod.modrinth)
 		put("curseforge", mod.curseforge)
 		put("kofi", mod.kofi)
-		put("discord", mod.discord)
 		put("modmenu_version", deps.modmenuVersion)
 		put("yacl_version", deps.yaclVersion)
 
@@ -162,5 +161,5 @@ fun <T> optionalProp(property: String, block: (String) -> T?): T? =
 	findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
 
 fun isPropDefined(property: String): Boolean {
-	return property(property)?.toString()?.isNotBlank() ?: false
+	return property(property)?.toString()?.isNotBlank() == true
 }

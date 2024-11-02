@@ -1,0 +1,8 @@
+{
+  "chathistoryplus.config.title": "Chat History Plus",
+  "chathistoryplus.config.category.general": "General",
+  "chathistoryplus.config.enabled": "Enabled",
+  "chathistoryplus.config.enabled.description": "Enables the mod.",
+  "chathistoryplus.config.chatHistorySize": "Chat History Size",
+  "chathistoryplus.config.chatHistorySize.description": "The number of chat messages to keep in the chat history."
+}
