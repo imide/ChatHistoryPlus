@@ -1,20 +1,19 @@
-# This workflow will automatically build the project with Gradle
-# It will run on every push and submitted PR.
-# Acts as a first line of defense for invalid commits.
-
-name: Build
-on: [ push, pull_request ]
+name: Build and release
+on: [ workflow_dispatch ]
 env:
   IMIDE_MAVEN_USERNAME: ${{ secrets.IMIDE_MAVEN_USERNAME }}
   IMIDE_MAVEN_PASSWORD: ${{ secrets.IMIDE_MAVEN_PASSWORD }}
+  CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+  MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build:
+  build-and-release:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         java: [ 21 ]
         os: [ ubuntu-22.04 ]
-    runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
@@ -28,12 +27,8 @@ jobs:
           cache: gradle
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build with gradle
+      - name: release with gradle
         uses: Wandalen/wretry.action@master
         with:
-          command: ./gradlew "buildAllVersions" --stacktrace
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Artifacts
-          path: versions/**/build/libs/*.jar
+          command: ./gradlew "releaseAllVersions" --stacktrace
+
