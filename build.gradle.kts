@@ -167,7 +167,7 @@ tasks {
 	}
 
 	publishMods {
-		displayName.set("${mod.name} version ${mod.version} for ${mc.version}")
+		displayName.set("${mod.name} version ${mod.version} for ${mc.version} (${loader.loader})")
 		file.set(remapJar.get().archiveFile)
 		changelog.set(
 			rootProject.file("changelog.md")
