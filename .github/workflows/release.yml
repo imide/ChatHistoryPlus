@@ -1,8 +1,6 @@
 name: Build and release
 on: [ workflow_dispatch ]
 env:
-  IMIDE_MAVEN_USERNAME: ${{ secrets.IMIDE_MAVEN_USERNAME }}
-  IMIDE_MAVEN_PASSWORD: ${{ secrets.IMIDE_MAVEN_PASSWORD }}
   CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
   MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -30,5 +28,5 @@ jobs:
       - name: release with gradle
         uses: Wandalen/wretry.action@master
         with:
-          command: ./gradlew "releaseAllVersions" --stacktrace
+          command: ./gradlew chiseledPublishMods --stacktrace
 

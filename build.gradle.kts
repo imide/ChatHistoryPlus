@@ -3,7 +3,6 @@ plugins {
 	id("io.freefair.lombok") version "8.10.2"
 
 	// Publishing
-	`maven-publish`
 	id("me.modmuss50.mod-publish-plugin") version "0.7.+"
 }
 
@@ -72,10 +71,6 @@ repositories {
 	maven("https://maven.terraformersmc.com") // Mod Menu
 	maven("https://maven.neoforged.net/releases") // NeoForge
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-
-	// My maven
-	maven("https://maven.imide.xyz/releases")
-	maven("https://maven.imide.xyz/snapshots")
 }
 
 dependencies {
@@ -210,30 +205,6 @@ tasks {
 			repository = mod.githubProject
 			accessToken = providers.environmentVariable("GITHUB_TOKEN")
 			commitish.set("main")
-		}
-	}
-
-	publishing {
-		publications {
-			create<MavenPublication>("mod") {
-				groupId = mod.group
-				artifactId = mod.id
-			}
-		}
-
-		repositories {
-			val username = providers.environmentVariable("IMIDE_MAVEN_USERNAME")
-			val password = providers.environmentVariable("IMIDE_MAVEN_PASSWORD")
-			if (username.isPresent && password.isPresent) {
-				maven {
-					name = "imide"
-					url = uri("https://maven.imide.xyz/releases")
-					credentials {
-						this.username = username.get()
-						this.password = password.get()
-					}
-				}
-			} else println("No imide maven credentials provided.")
 		}
 	}
 }

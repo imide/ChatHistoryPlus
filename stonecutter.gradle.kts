@@ -13,12 +13,7 @@ stonecutter registerChiseled tasks.register("chiseledRunClient", stonecutter.chi
     ofTask("runClient")
 }
 
-stonecutter registerChiseled tasks.register("buildAllVersions", stonecutter.chiseled) {
+stonecutter registerChiseled tasks.register("chiseledPublishMods", stonecutter.chiseled) {
     group = "chiseled"
-    ofTask("build")
-}
-
-stonecutter registerChiseled tasks.register("releaseAllVersions", stonecutter.chiseled) {
-    group = "chiseled"
-    ofTask("releaseMod")
+    ofTask("publishMods")
 }
