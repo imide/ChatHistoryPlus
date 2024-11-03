@@ -2,6 +2,11 @@ plugins {
 	id("dev.architectury.loom") version "1.7.+"
 	id("io.freefair.lombok") version "8.10.2"
 
+	// Indra and spotless
+	id("com.diffplug.spotless") version "7.0.0.BETA4"
+	id("net.kyori.indra.licenser.spotless") version "3.1.3"
+	id("net.kyori.indra.git") version "3.1.3"
+
 	// Publishing
 	id("me.modmuss50.mod-publish-plugin") version "0.7.+"
 	`maven-publish`
@@ -73,6 +78,7 @@ repositories {
 	maven("https://maven.terraformersmc.com") // Mod Menu
 	maven("https://maven.neoforged.net/releases") // NeoForge
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+	mavenCentral()
 }
 
 dependencies {
@@ -164,6 +170,21 @@ tasks {
 
 		dependsOn("publishMods")
 		dependsOn("publish")
+	}
+
+	register("format") {
+		group = "formatting"
+
+		description = "Formats the source code according to the project style."
+		dependsOn("spotlessApply")
+	}
+
+	spotless {
+		java {
+			target("src/**/*.java")
+			googleJavaFormat()
+			formatAnnotations()
+		}
 	}
 
 	publishMods {
