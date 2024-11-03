@@ -179,6 +179,8 @@ tasks {
 				?: "No changelog provided."
 		)
 
+		type = STABLE
+
 		if (loader.isFabric) modLoaders.add("fabric")
 		if (loader.isNeoforge) modLoaders.add("neoforge")
 
@@ -207,7 +209,6 @@ tasks {
 		github {
 			repository = mod.githubProject
 			accessToken = providers.environmentVariable("GITHUB_TOKEN")
-
 			commitish.set("main")
 		}
 	}
