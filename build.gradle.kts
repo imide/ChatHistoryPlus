@@ -4,6 +4,8 @@ plugins {
 
 	// Publishing
 	id("me.modmuss50.mod-publish-plugin") version "0.7.+"
+	`maven-publish`
+	`java-library`
 }
 
 class ModData {
@@ -182,29 +184,49 @@ tasks {
 
 		modrinth {
 			projectId = mod.modrinthId
-			accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+			accessToken = providers.gradleProperty("MODRINTH_TOKEN")
 			minecraftVersions.addAll(mc.targets)
 
 			if (loader.isFabric) requires("fabric-api") else null
 			requires("modmenu")
-			requires("yet-another-config-lib")
+			requires("yacl")
 		}
 		curseforge {
 			projectId = mod.curseforgeId
-			accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+			accessToken = providers.gradleProperty("CURSEFORGE_TOKEN")
 			minecraftVersions.addAll(mc.targets)
 
 			if (loader.isFabric) requires("fabric-api") else null
 
 			requires("modmenu")
-			requires("yet-another-config-lib")
+			requires("yacl")
 
 		}
 
 		github {
 			repository = mod.githubProject
-			accessToken = providers.environmentVariable("GITHUB_TOKEN")
+			accessToken = providers.gradleProperty("GITHUB_TOKEN")
 			commitish.set("main")
+		}
+	}
+
+	publishing {
+		publications {
+			create<MavenPublication>("mod") {
+				groupId = mod.group
+				artifactId = mod.id
+				version = mod.version as String?
+			}
+		}
+
+		repositories {
+			maven("https://maven.imide.xyz/releases/") {
+				name = "imideReleases"
+				credentials(PasswordCredentials::class)
+				authentication {
+					create<BasicAuthentication>("basic")
+				}
+			}
 		}
 	}
 }
