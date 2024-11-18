@@ -8,7 +8,7 @@ plugins {
 	id("net.kyori.indra.git") version "3.1.3"
 
 	// Publishing
-	id("me.modmuss50.mod-publish-plugin") version "0.7.+"
+	id("me.modmuss50.mod-publish-plugin") version "0.8.+"
 	`maven-publish`
 	`java-library`
 }
