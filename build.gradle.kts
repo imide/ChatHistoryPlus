@@ -1,6 +1,6 @@
 plugins {
 	id("dev.architectury.loom") version "1.7.+"
-	id("io.freefair.lombok") version "8.10.2"
+	id("io.freefair.lombok") version "8.11"
 
 	// Indra and spotless
 	id("com.diffplug.spotless") version "7.0.0.BETA4"
