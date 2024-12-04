@@ -28,6 +28,9 @@ class ModData {
 	val modrinthId = property("modrinthId").toString()
 	val curseforgeId = property("curseforgeId").toString()
 	val githubProject = property("githubProject").toString()
+
+    val isAlpha = "alpha" in version.toString()
+    val isBeta = "beta" in version.toString()
 }
 
 class Dependencies {
@@ -114,11 +117,10 @@ dependencies {
 
 java {
 	withSourcesJar()
-	val java = if (stonecutter.compare(
-			stonecutter.current.version,
-			"1.20.6"
-		) >= 0
-	) JavaVersion.VERSION_21 else JavaVersion.VERSION_17
+    val java = if (stonecutter.eval(mc.version.toString(), ">=1.20.5"))
+        JavaVersion.VERSION_21
+    else
+        JavaVersion.VERSION_17
 	sourceCompatibility = java
 	targetCompatibility = java
 }

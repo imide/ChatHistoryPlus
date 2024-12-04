@@ -1,5 +1,3 @@
-import dev.kikugie.stonecutter.StonecutterSettings
-
 pluginManagement {
 	repositories {
 		mavenCentral()
@@ -13,15 +11,15 @@ pluginManagement {
 }
 
 plugins {
-	id("dev.kikugie.stonecutter") version "0.4.6"
+    id("dev.kikugie.stonecutter") version "0.5-beta.5"
     id("net.kyori.indra.git") version "3.1.3"
 }
 
-extensions.configure<StonecutterSettings> {
+stonecutter {
     kotlinController = true
     centralScript = "build.gradle.kts"
 
-    shared {
+    create(rootProject) {
         fun mc(mcVersion: String, loaders: Iterable<String>) {
             for (loader in loaders) {
                 vers("$mcVersion-$loader", mcVersion)
@@ -35,9 +33,7 @@ extensions.configure<StonecutterSettings> {
         mc("1.21.3", listOf("fabric", "neoforge"))
         mc("1.21.4", listOf("fabric", "neoforge"))
 
-        vcsVersion("1.21.4-fabric")
+        vcsVersion = "1.21.4-fabric"
     }
-    create(rootProject)
 }
-
 rootProject.name = "ChatHistoryPlus"
