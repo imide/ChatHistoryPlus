@@ -209,7 +209,7 @@ tasks {
 
 		modrinth {
 			projectId = mod.modrinthId
-			accessToken = providers.gradleProperty("MODRINTH_TOKEN")
+			accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 			minecraftVersions.addAll(mc.targets)
 
 			if (loader.isFabric) requires("fabric-api") else null
@@ -218,7 +218,7 @@ tasks {
 		}
 		curseforge {
 			projectId = mod.curseforgeId
-			accessToken = providers.gradleProperty("CURSEFORGE_TOKEN")
+			accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
 			minecraftVersions.addAll(mc.targets)
 
 			if (loader.isFabric) requires("fabric-api") else null
@@ -230,7 +230,7 @@ tasks {
 
 		github {
 			repository = mod.githubProject
-			accessToken = providers.gradleProperty("GITHUB_TOKEN")
+			accessToken = providers.environmentVariable("GITHUB_TOKEN")
 			commitish.set("main")
 		}
 	}
@@ -245,13 +245,34 @@ tasks {
 		}
 
 		repositories {
-			maven("https://maven.imide.xyz/releases/") {
-				name = "imideReleases"
-				credentials(PasswordCredentials::class)
-				authentication {
-					create<BasicAuthentication>("basic")
-				}
-			}
+            val username = "IMIDE_MAVEN_USER".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it)}.toString()
+            val password = "IMIDE_MAVEN_PASS".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }.toString()
+
+            if (username.isNotBlank() && password.isNotBlank()) {
+                maven("https://maven.imide.xyz/releases/") {
+                    name = "imideReleases"
+                    credentials {
+                        this.username = username
+                        this.password = password
+                    }
+                    authentication {
+                        create<BasicAuthentication>("basic")
+                    }
+                }
+
+                maven("https://maven.imide.xyz/snapshots/") {
+                    name = "imideSnapshots"
+                    credentials {
+                        this.username = username
+                        this.password = password
+                    }
+                    authentication {
+                        create<BasicAuthentication>("basic")
+                    }
+                }
+            } else {
+                println("No username or password for maven.imide.xyz provided.")
+            }
 		}
 	}
 }
