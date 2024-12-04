@@ -18,25 +18,26 @@ plugins {
 }
 
 extensions.configure<StonecutterSettings> {
-	kotlinController= true
-	centralScript = "build.gradle.kts"
+    kotlinController = true
+    centralScript = "build.gradle.kts"
 
-	shared {
-		fun mc(mcVersion: String, loaders: Iterable<String>) {
-			for (loader in loaders) {
-				vers("$mcVersion-$loader", mcVersion)
-			}
-		}
+    shared {
+        fun mc(mcVersion: String, loaders: Iterable<String>) {
+            for (loader in loaders) {
+                vers("$mcVersion-$loader", mcVersion)
+            }
+        }
 
-		mc("1.20.1", listOf("fabric"))
-		mc("1.20.4", listOf("fabric"))
-		mc("1.20.6", listOf("fabric"))
-		mc("1.21", listOf("fabric", "neoforge"))
-		mc("1.21.3", listOf("fabric", "neoforge"))
+        mc("1.20.1", listOf("fabric"))
+        mc("1.20.4", listOf("fabric"))
+        mc("1.20.6", listOf("fabric"))
+        mc("1.21", listOf("fabric", "neoforge"))
+        mc("1.21.3", listOf("fabric", "neoforge"))
+        mc("1.21.4", listOf("fabric", "neoforge"))
 
-		vcsVersion("1.21.3-fabric")
-	}
-	create(rootProject)
+        vcsVersion("1.21.4-fabric")
+    }
+    create(rootProject)
 }
 
 rootProject.name = "ChatHistoryPlus"
