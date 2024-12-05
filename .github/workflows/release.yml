@@ -20,9 +20,8 @@ jobs:
           
       - name: setup gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        with:
+            cache-overwrite-existing: true
 
       - name: make wrapper executable
         run: chmod +x ./gradlew
