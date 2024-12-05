@@ -1,10 +1,5 @@
 name: Build and release
 on: [ workflow_dispatch ]
-env:
-  CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-  MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   build-and-release:
     runs-on: ${{ matrix.os }}
@@ -28,5 +23,11 @@ jobs:
       - name: release with gradle
         uses: Wandalen/wretry.action@master
         with:
-          command: ./gradlew chiseledPublishMods --stacktrace
+          command: ./gradlew releaseAllVersions --stacktrace
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMIDE_MAVEN_USER: ${{ secerts.IMIDE_MAVEN_USER }}
+          IMIDE_MAVEN_PASS: ${{ secerts.IMIDE_MAVEN_PASS }}
 
