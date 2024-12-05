@@ -28,7 +28,7 @@ jobs:
       - name: build with gradle
         uses: Wandalen/wretry.action@master
         with:
-          command: ./gradlew chiseledBuild --stacktrace
+          command: ./gradlew buildAllVersions --stacktrace
       - name: capture build artifacts
         uses: actions/upload-artifact@v4
         with:
