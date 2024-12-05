@@ -35,6 +35,6 @@ jobs:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          IMIDE_MAVEN_USER: ${{ secerts.IMIDE_MAVEN_USER }}
-          IMIDE_MAVEN_PASS: ${{ secerts.IMIDE_MAVEN_PASS }}
+          IMIDE_MAVEN_USER: ${{ secrets.IMIDE_MAVEN_USER }}
+          IMIDE_MAVEN_PASS: ${{ secrets.IMIDE_MAVEN_PASS }}
 
