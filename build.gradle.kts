@@ -8,7 +8,7 @@ plugins {
 	id("net.kyori.indra.git") version "3.1.3"
 
 	// Publishing
-	id("me.modmuss50.mod-publish-plugin") version "0.8.+"
+    id("me.modmuss50.mod-publish-plugin")
 	`maven-publish`
 	`java-library`
 }
@@ -56,7 +56,9 @@ val mod = ModData()
 val deps = Dependencies()
 val loader = LoaderData()
 
+// Project stuff
 version = "${mod.version}+${mc.version}-${loader.loader}"
+
 group = mod.group
 base { archivesName.set(mod.id) }
 
@@ -173,6 +175,10 @@ tasks {
 
 		dependsOn("publishMods")
 		dependsOn("publish")
+
+        if (!project.publishMods.dryRun.get()) {
+            dependsOn("publish")
+        }
 	}
 
 	register("format") {
@@ -191,16 +197,10 @@ tasks {
 	}
 
 	publishMods {
-		displayName.set("${mod.name} version ${mod.version} for ${mc.version} (${loader.loader})")
-		file.set(remapJar.get().archiveFile)
-		changelog.set(
-			rootProject.file("changelog.md")
-				.takeIf { it.exists() }
-				?.readText()
-				?: "No changelog provided."
-		)
+        from(rootProject.publishMods)
+        dryRun.set(rootProject.publishMods.dryRun)
 
-		type = STABLE
+        file.set(remapJar.get().archiveFile)
 
 		if (loader.isFabric) modLoaders.add("fabric")
 		if (loader.isNeoforge) modLoaders.add("neoforge")
