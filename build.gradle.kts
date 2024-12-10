@@ -1,5 +1,5 @@
 plugins {
-	id("dev.architectury.loom") version "1.7.+"
+    id("dev.architectury.loom") version "1.9.+"
 	id("io.freefair.lombok") version "8.11"
 
 	// Indra and spotless
@@ -96,8 +96,7 @@ dependencies {
 
 		// Parchment mappings (it adds parameter mappings & javadoc)
 		optionalProp("deps.parchment_version") {
-            if (mc.version == "1.21.3" || mc.version == "1.21.4") parchment("org.parchmentmc.data:parchment-1.21:$it@zip") // TODO: remove when parchment 1.21.3/4
-			else parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
+            parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
 		}
 	})
 
@@ -208,19 +207,23 @@ tasks {
 
 		modrinth {
 			projectId = mod.modrinthId
-			accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+            accessToken = {
+                providers.environmentVariable("MODRINTH_TOKEN").orNull ?: providers.gradleProperty("MODRINTH_TOKEN")
+            }.toString()
 			minecraftVersions.addAll(mc.targets)
 
-			if (loader.isFabric) requires("fabric-api") else null
+            if (loader.isFabric) requires("fabric-api")
 			requires("modmenu")
 			requires("yacl")
 		}
 		curseforge {
 			projectId = mod.curseforgeId
-			accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+            accessToken = {
+                providers.environmentVariable("CURSEFORGE_TOKEN").orNull ?: providers.gradleProperty("CURSEFORGE_TOKEN")
+            }.toString()
 			minecraftVersions.addAll(mc.targets)
 
-			if (loader.isFabric) requires("fabric-api") else null
+            if (loader.isFabric) requires("fabric-api")
 
 			requires("modmenu")
 			requires("yacl")
@@ -229,7 +232,9 @@ tasks {
 
 		github {
 			repository = mod.githubProject
-			accessToken = providers.environmentVariable("GITHUB_TOKEN")
+            accessToken = {
+                providers.environmentVariable("GITHUB_TOKEN").orNull ?: providers.gradleProperty("GITHUB_TOKEN")
+            }.toString()
 			commitish.set("main")
 		}
 	}
@@ -244,7 +249,9 @@ tasks {
 		}
 
 		repositories {
-            val username = "IMIDE_MAVEN_USER".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it)}.toString()
+            val username =
+                "IMIDE_MAVEN_USER".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }
+                    .toString()
             val password = "IMIDE_MAVEN_PASS".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }.toString()
 
             if (username.isNotBlank() && password.isNotBlank()) {
