@@ -21,17 +21,15 @@ jobs:
           
       - name: setup gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-            cache-overwrite-existing: true
 
       - name: make wrapper executable
         run: chmod +x ./gradlew
 
       - name: build with gradle
-        run: ./gradlew buildAllVersions --stacktrace
+        run: ./gradlew chiseledBuild --stacktrace
         
       - name: release with gradle
-        run: ./gradlew releaseAllVersions --stacktrace
+        run: ./gradlew chiseledPublishMods --stacktrace
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

@@ -170,10 +170,8 @@ tasks {
 	}
 
 	register("releaseMod") {
-		group = "publishing"
-
+        group = "mod"
 		dependsOn("publishMods")
-		dependsOn("publish")
 
         if (!project.publishMods.dryRun.get()) {
             dependsOn("publish")
@@ -196,13 +194,41 @@ tasks {
 	}
 
 	publishMods {
-        from(rootProject.publishMods)
-        dryRun.set(rootProject.publishMods.dryRun)
+        displayName.set("ChatHistoryPlus ${mod.version} for MC ${mc.version} (${loader.loader})")
+
+        if (providers.environmentVariable("DRY_RUN").getOrNull() != null) {
+            dryRun.set(true)
+            println("DRY_RUN is set, publishing will not be performed.")
+        }
 
         file.set(remapJar.get().archiveFile)
 
+        val modVersion: String = mod.version.toString()
+
+        version.set(modVersion)
+
 		if (loader.isFabric) modLoaders.add("fabric")
 		if (loader.isNeoforge) modLoaders.add("neoforge")
+
+        val modChangelog =
+            rootProject.file("changelog.md")
+                .takeIf { it.exists() }
+                ?.readText()
+                ?.replace("{version}", modVersion)
+                ?.replace(
+                    "{targets}", stonecutter.versions
+                        .map { it.project }
+                        .joinToString(separator = "\n") { "- ${it}" })
+                ?: "No changelog provided."
+        changelog.set(modChangelog)
+
+        type.set(
+            when {
+                "alpha" in modVersion -> ALPHA
+                "beta" in modVersion -> BETA
+                else -> STABLE
+            }
+        )
 
 
 		modrinth {
@@ -212,8 +238,7 @@ tasks {
             }.toString()
 			minecraftVersions.addAll(mc.targets)
 
-            if (loader.isFabric) requires("fabric-api")
-			requires("modmenu")
+            if (loader.isFabric) requires("fabric-api", "modmenu")
 			requires("yacl")
 		}
 		curseforge {
@@ -223,9 +248,7 @@ tasks {
             }.toString()
 			minecraftVersions.addAll(mc.targets)
 
-            if (loader.isFabric) requires("fabric-api")
-
-			requires("modmenu")
+            if (loader.isFabric) requires("fabric-api", "modmenu")
 			requires("yacl")
 
 		}
@@ -244,7 +267,7 @@ tasks {
 			create<MavenPublication>("mod") {
 				groupId = mod.group
 				artifactId = mod.id
-				version = mod.version as String?
+                version = version
 			}
 		}
 
