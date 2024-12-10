@@ -3,7 +3,18 @@
 # Acts as a first line of defense for invalid commits.
 
 name: Build
-on: [ push, pull_request ]
+on:
+    push:
+        paths-ignore:
+            - '**.md'
+            - '.gitignore'
+            - '.github/**'
+    pull_request:
+        paths-ignore:
+            - '**.md'
+            - '.gitignore'
+            - '.github/**'
+
 
 jobs:
   build:
