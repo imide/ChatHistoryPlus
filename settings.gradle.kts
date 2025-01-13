@@ -11,7 +11,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.5-beta.5"
+    id("dev.kikugie.stonecutter") version "0.5.1"
     id("net.kyori.indra.git") version "3.1.3"
 }
 
