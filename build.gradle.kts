@@ -3,7 +3,7 @@ plugins {
 	id("io.freefair.lombok") version "8.11"
 
 	// Indra and spotless
-	id("com.diffplug.spotless") version "7.0.0.BETA4"
+	id("com.diffplug.spotless") version "7.0.1"
 	id("net.kyori.indra.licenser.spotless") version "3.1.3"
 	id("net.kyori.indra.git") version "3.1.3"
 
