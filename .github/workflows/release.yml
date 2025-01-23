@@ -28,7 +28,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: build with gradle
-        run: ./gradlew chiseledBuild --stacktrace
+        run: ./gradlew chiseledBuildAndCollect --stacktrace
         
       - name: release with gradle
         run: ./gradlew chiseledPublishMods --stacktrace

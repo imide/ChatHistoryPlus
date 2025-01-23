@@ -1,17 +1,28 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    id("net.kyori.indra.git")
-    id("me.modmuss50.mod-publish-plugin") version "0.8.+"
 }
 
 stonecutter active "1.21.4-fabric" /* [SC] DO NOT EDIT */
 
-stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
-    group = "mod"
-    ofTask("build")
+fun chiseledTask(task : String, group : String) {
+    val name = "chiseled${task.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}"
+
+    stonecutter registerChiseled tasks.register(name, stonecutter.chiseled) {
+        versions { branch, version -> version.project.endsWith("neoforge") }
+        this.group = group
+        ofTask(task)
+        dependsOn("Pre${name.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}")
+    }
+
+    stonecutter registerChiseled tasks.register("Pre${name.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}", stonecutter.chiseled) {
+        versions { branch, version -> version.project.endsWith("fabric") }
+        this.group = group
+        ofTask(task)
+    }
 }
 
-stonecutter registerChiseled tasks.register("chiseledPublishMods", stonecutter.chiseled) {
-    group = "mod"
-    ofTask("releaseMod")
-}
+
+chiseledTask("buildAndCollect", "project")
+chiseledTask("publishMods", "publishing")
+chiseledTask("publishMavenPublicationToMavenLocal", "publishing")
+chiseledTask("publishMavenPublicationToImideRepository", "publishing")

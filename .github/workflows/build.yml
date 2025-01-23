@@ -44,7 +44,7 @@ jobs:
         run: chmod +x ./gradlew
         
       - name: build with gradle
-        run: ./gradlew chiseledBuild --stacktrace
+        run: ./gradlew chiseledBuildAndCollect --stacktrace
           
       - name: capture build artifacts
         uses: actions/upload-artifact@v4

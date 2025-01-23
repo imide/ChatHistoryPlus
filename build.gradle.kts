@@ -1,5 +1,11 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
+    java
+
+    // Architectury
     id("dev.architectury.loom") version "1.9.+"
+	id("architectury-plugin") version "3.4-SNAPSHOT"
 	id("io.freefair.lombok") version "8.11"
 
 	// Indra and spotless
@@ -8,9 +14,8 @@ plugins {
 	id("net.kyori.indra.git") version "3.1.3"
 
 	// Publishing
-    id("me.modmuss50.mod-publish-plugin")
+    id("me.modmuss50.mod-publish-plugin") version "0.8.+"
 	`maven-publish`
-	`java-library`
 }
 
 class ModData {
@@ -36,13 +41,28 @@ class ModData {
 class Dependencies {
 	val modmenuVersion = property("deps.modmenu_version")
 	val yaclVersion = property("deps.yacl_version")
-	val devauthVersion = property("deps.devauth_version")
+    val fapiVersion = property("deps.fapi_version")
 }
 
-class LoaderData {
-	val loader = loom.platform.get().name.lowercase()
-	val isFabric = loader == "fabric"
-	val isNeoforge = loader == "neoforge"
+class LoaderData(private val project: Project) {
+    val loader = project.loom.platform.get().name.lowercase()
+
+     val isFabric = loader == "fabric"
+     val isNeoforge = loader == "neoforge"
+
+    fun getVersion() : String = if (isNeoforge) {
+        project.findProperty("deps.neoforge").toString()
+    } else {
+        project.property("deps.fabric_loader").toString()
+    }
+
+    fun neoforge(container: () -> TaskContainer) {
+        if(isNeoforge) container.invoke()
+    }
+
+    fun fabric(container: () -> TaskContainer) {
+        if(isFabric) container.invoke()
+    }
 }
 
 class McData {
@@ -54,7 +74,7 @@ class McData {
 val mc = McData()
 val mod = ModData()
 val deps = Dependencies()
-val loader = LoaderData()
+val loader = LoaderData(project)
 
 // Project stuff
 version = "${mod.version}+${mc.version}-${loader.loader}"
@@ -73,47 +93,112 @@ loom {
 		runDir = "../../run"
 	}
 
-	runConfigs.remove(runConfigs["server"])
+	// runConfigs.remove(runConfigs["server"])
 }
 
 repositories {
-	maven("https://maven.parchmentmc.org") // Parchment
+    fun strictMaven(url: String, vararg groups: String) = exclusiveContent {
+        forRepository { maven(url) }
+        filter { groups.forEach(::includeGroup) }
+    }
+    strictMaven("https://api.modrinth.com/maven", "maven.modrinth")
+    strictMaven("https://cursemaven.com", "curse.maven")
+    strictMaven("https://thedarkcolour.github.io/KotlinForForge/", "thedarkcolour")
+    maven("https://maven.parchmentmc.org") // Parchment
 	maven("https://maven.isxander.dev/releases") // YACL
-	maven("https://thedarkcolour.github.io/KotlinForForge") // Kotlin for Forge - required by YACL
 	maven("https://maven.terraformersmc.com") // Mod Menu
 	maven("https://maven.neoforged.net/releases") // NeoForge
-	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
 	mavenCentral()
 }
 
 dependencies {
 	minecraft("com.mojang:minecraft:${mc.version}")
+//
+//	@Suppress("UnstableApiUsage")
+//	mappings(loom.layered {
+//		// Mojmap mappings
+//		officialMojangMappings()
+//
+//		// Parchment mappings (it adds parameter mappings & javadoc)
+//		optionalProp("deps.parchment_version") {
+//            parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
+//		}
+//	})
+//
+//
+//	if (loader.isFabric) {
+//		modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+//        if (mc.version == "1.21.3") modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // YACL 1.21.2 is the same as 1.21.3
+//        else modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
+//		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
+//	} else if (loader.isNeoforge) {
+//		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
+//        if (mc.version == "1.21.3") implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // YACL 1.21.2 is the same as 1.21.3
+//        else implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}") {
+//            isTransitive = false
+//        }
+//	}
+}
 
-	@Suppress("UnstableApiUsage")
-	mappings(loom.layered {
-		// Mojmap mappings
-		officialMojangMappings()
-
-		// Parchment mappings (it adds parameter mappings & javadoc)
-		optionalProp("deps.parchment_version") {
-            parchment("org.parchmentmc.data:parchment-${property("mod.mc_version")}:$it@zip")
-		}
-	})
-
-	modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
-
-	if (loader.isFabric) {
-		modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
-        if (mc.version == "1.21.3") modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // YACL 1.21.2 is the same as 1.21.3
-        else modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
-		modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
-	} else if (loader.isNeoforge) {
-		"neoForge"("net.neoforged:neoforge:${findProperty("deps.neoforge")}")
-        if (mc.version == "1.21.3") implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}") // YACL 1.21.2 is the same as 1.21.3
-        else implementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}") {
-            isTransitive = false
+loader.fabric {
+    dependencies {
+        modImplementation("net.fabricmc:fabric-loader:${loader.getVersion()}")
+        // Mod Menu
+        modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
+        // YACL
+        // quite annoyingly, puts backwards compatable versions (1.21 and 1.21.1) the LOWER version (but not all the time????)
+        // effected versions: 1.21.1 (1.21), 1.21.3 (1.21.2)
+        when (mc.version) {
+            "1.21.1" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21-${loader.loader}")
+            "1.21.3" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}")
+            else -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
         }
-	}
+
+        // Fabric API
+        modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fapiVersion}")
+
+        mappings(loom.layered {
+            officialMojangMappings()
+
+            optionalProp("deps.parchment_version") {
+                parchment("org.parchmentmc.data:parchment-${mc.version}:$it@zip")
+            }
+        })
+    }
+
+    fabricApi {
+        configureDataGeneration {
+            modId = mod.id
+        }
+    }
+
+    tasks {
+
+    }
+}
+
+loader.neoforge {
+    dependencies {
+        mappings(loom.layered {
+            officialMojangMappings()
+
+            optionalProp("deps.parchment_version") {
+                parchment("org.parchmentmc.data:parchment-${mc.version}:$it@zip")
+            }
+        })
+        "neoForge"("net.neoforged:neoforge:${loader.getVersion()}")
+
+        // YACL
+        // quite annoyingly, puts backwards compatable versions (1.21 and 1.21.1) the LOWER version (but not all the time????)
+        // effected versions: 1.21.1 (1.21), 1.21.3 (1.21.2)
+        when (mc.version) {
+            "1.21.1" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21-${loader.loader}")
+            "1.21.3" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}")
+            else -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
+        }
+    }
+
+   tasks {}
 }
 
 java {
@@ -169,21 +254,19 @@ tasks {
 		}
 	}
 
-	register("releaseMod") {
-        group = "mod"
-		dependsOn("publishMods")
-
-        if (!project.publishMods.dryRun.get()) {
-            dependsOn("publish")
-        }
-	}
-
 	register("format") {
 		group = "formatting"
 
 		description = "Formats the source code according to the project style."
 		dependsOn("spotlessApply")
 	}
+
+    register<Copy>("buildAndCollect") {
+        group = "build"
+        from(remapJar.get().archiveFile)
+        into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
+        dependsOn("build")
+    }
 
 	spotless {
 		java {
@@ -192,6 +275,10 @@ tasks {
 			formatAnnotations()
 		}
 	}
+
+    clean {
+        delete(file(rootProject.file("build")))
+    }
 
 	publishMods {
         displayName.set("ChatHistoryPlus ${mod.version} for MC ${mc.version} (${loader.loader})")
@@ -262,48 +349,68 @@ tasks {
 		}
 	}
 
-	publishing {
-		publications {
-			create<MavenPublication>("mod") {
-				groupId = mod.group
-				artifactId = mod.id
-                version = version
-			}
-		}
+   extensions.configure<PublishingExtension> {
+       repositories {
+           maven {
+               name = "imide"
+               url = uri("https://maven.imide.xyz/releases")
+               credentials(PasswordCredentials::class)
+               authentication {
+                   create<BasicAuthentication>("basic")
+               }
+           }
+       }
+       publications {
+           create<MavenPublication>("maven") {
+               groupId = "${mod.group}.${mod.id}"
+               artifactId = "${mod.id}-${loader.loader}"
+               version = "${mod.version}+${mc.version}"
 
-		repositories {
-            val username =
-                "IMIDE_MAVEN_USER".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }
-                    .toString()
-            val password = "IMIDE_MAVEN_PASS".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }.toString()
-
-            if (username.isNotBlank() && password.isNotBlank()) {
-                maven("https://maven.imide.xyz/releases/") {
-                    name = "imideReleases"
-                    credentials {
-                        this.username = username
-                        this.password = password
-                    }
-                    authentication {
-                        create<BasicAuthentication>("basic")
-                    }
-                }
-
-                maven("https://maven.imide.xyz/snapshots/") {
-                    name = "imideSnapshots"
-                    credentials {
-                        this.username = username
-                        this.password = password
-                    }
-                    authentication {
-                        create<BasicAuthentication>("basic")
-                    }
-                }
-            } else {
-                println("No username or password for maven.imide.xyz provided.")
-            }
-		}
-	}
+           }
+       }
+   }
+//	publishing {
+//		publications {
+//			create<MavenPublication>("mod") {
+//				groupId = mod.group
+//				artifactId = mod.id
+//                version = version
+//			}
+//		}
+//
+//		repositories {
+//            val username =
+//                "IMIDE_MAVEN_USER".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }
+//                    .toString()
+//            val password = "IMIDE_MAVEN_PASS".let { providers.environmentVariable(it).orNull ?: providers.gradleProperty(it) }.toString()
+//
+//            if (username.isNotBlank() && password.isNotBlank()) {
+//                maven("https://maven.imide.xyz/releases/") {
+//                    name = "imideReleases"
+//                    credentials {
+//                        this.username = username
+//                        this.password = password
+//                    }
+//                    authentication {
+//                        create<BasicAuthentication>("basic")
+//                    }
+//                }
+//
+//                maven("https://maven.imide.xyz/snapshots/") {
+//                    name = "imideSnapshots"
+//                    credentials {
+//                        this.username = username
+//                        this.password = password
+//                    }
+//                    authentication {
+//                        create<BasicAuthentication>("basic")
+//                    }
+//                }
+//            } else {
+//                println("No username or password for maven.imide.xyz provided.")
+//            }
+//		}
+//	}
 }
 
 if (stonecutter.current.isActive) {
@@ -319,3 +426,4 @@ fun <T> optionalProp(property: String, block: (String) -> T?): T? =
 fun isPropDefined(property: String): Boolean {
 	return property(property)?.toString()?.isNotBlank() == true
 }
+
