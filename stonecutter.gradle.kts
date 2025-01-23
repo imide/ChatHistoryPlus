@@ -8,14 +8,14 @@ fun chiseledTask(task : String, group : String) {
     val name = "chiseled${task.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}"
 
     stonecutter registerChiseled tasks.register(name, stonecutter.chiseled) {
-        versions { branch, version -> version.project.endsWith("neoforge") }
+        versions { _, version -> version.project.endsWith("neoforge") }
         this.group = group
         ofTask(task)
         dependsOn("Pre${name.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}")
     }
 
     stonecutter registerChiseled tasks.register("Pre${name.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}", stonecutter.chiseled) {
-        versions { branch, version -> version.project.endsWith("fabric") }
+        versions { _, version -> version.project.endsWith("fabric") }
         this.group = group
         ofTask(task)
     }
