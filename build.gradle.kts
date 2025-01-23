@@ -320,9 +320,7 @@ tasks {
 
 		modrinth {
 			projectId = mod.modrinthId
-            accessToken = {
-                providers.environmentVariable("MODRINTH_TOKEN").orNull ?: providers.gradleProperty("MODRINTH_TOKEN")
-            }.toString()
+            accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 			minecraftVersions.addAll(mc.targets)
 
             if (loader.isFabric) requires("fabric-api", "modmenu")
@@ -330,9 +328,7 @@ tasks {
 		}
 		curseforge {
 			projectId = mod.curseforgeId
-            accessToken = {
-                providers.environmentVariable("CURSEFORGE_TOKEN").orNull ?: providers.gradleProperty("CURSEFORGE_TOKEN")
-            }.toString()
+            accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
 			minecraftVersions.addAll(mc.targets)
 
             if (loader.isFabric) requires("fabric-api", "modmenu")
@@ -342,9 +338,7 @@ tasks {
 
 		github {
 			repository = mod.githubProject
-            accessToken = {
-                providers.environmentVariable("GITHUB_TOKEN").orNull ?: providers.gradleProperty("GITHUB_TOKEN")
-            }.toString()
+            accessToken = providers.environmentVariable("GITHUB_TOKEN")
 			commitish.set("main")
 		}
 	}
