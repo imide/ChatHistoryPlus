@@ -45,7 +45,11 @@ jobs:
         
       - name: build with gradle
         run: ./gradlew chiseledBuildAndCollect --stacktrace
-          
+        # right now this also needs the maven envs, its annoying. will fix later if i can lool
+        env:
+            IMIDE_MAVEN_USER: ${{ secrets.IMIDE_MAVEN_USER }}
+            IMIDE_MAVEN_PASS: ${{ secrets.IMIDE_MAVEN_PASS }}
+
       - name: capture build artifacts
         uses: actions/upload-artifact@v4
         with:

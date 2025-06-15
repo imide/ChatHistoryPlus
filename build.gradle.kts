@@ -253,6 +253,16 @@ tasks {
         dependsOn("build")
     }
 
+    register("publishAndReleaseMods") {
+        group = "publishing"
+
+        dependsOn("publishMods")
+
+        if (!project.publishMods.dryRun.get()) {
+            dependsOn("publishMavenPublicationToImideRepository")
+        }
+    }
+
 	spotless {
 		java {
 			target("src/**/*.java")
@@ -321,6 +331,8 @@ tasks {
 
 		}
 	}
+
+
 
    extensions.configure<PublishingExtension> {
        repositories {

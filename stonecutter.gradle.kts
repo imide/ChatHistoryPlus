@@ -24,5 +24,6 @@ fun chiseledTask(task : String, group : String) {
 
 chiseledTask("buildAndCollect", "project")
 chiseledTask("publishMods", "publishing")
+chiseledTask("publishAndReleaseMods", "publishing")
 chiseledTask("publishMavenPublicationToMavenLocal", "publishing")
 chiseledTask("publishMavenPublicationToImideRepository", "publishing")
