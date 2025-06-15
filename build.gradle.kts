@@ -315,7 +315,7 @@ tasks {
 
 		modrinth {
 			projectId = mod.modrinthId
-            accessToken = System.getenv("MODRINTH_TOKEN") ?: providers.gradleProperty("MODRINTH_TOKEN").toString()
+            accessToken = providers.environmentVariable("MODRINTH_TOKEN").toString()
 			minecraftVersions.addAll(mc.targets)
 
             if (loader.isFabric) requires("fabric-api", "modmenu")
@@ -323,7 +323,7 @@ tasks {
 		}
 		curseforge {
 			projectId = mod.curseforgeId
-            accessToken = System.getenv("CURSEFORGE_TOKEN") ?: providers.gradleProperty("CURSEFORGE_TOKEN").toString()
+            accessToken = providers.environmentVariable("CURSEFORGE_TOKEN").toString()
 			minecraftVersions.addAll(mc.targets)
 
             if (loader.isFabric) requires("fabric-api", "modmenu")
