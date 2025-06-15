@@ -10,5 +10,6 @@ This version of ChatHistoryPlus has the following target versions:
 - Updated fabric and neoforge loader versions
 - Update parchment mappings to their respective versions
 - Update gradle plugins (no effect on end users)
+- Stopped supporting Curseforge
 
 ## Thank you!

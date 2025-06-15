@@ -5,10 +5,6 @@
    <img alt="modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg">
 </a>
 
-<a href="https://curseforge.com/minecraft/mc-mods/chat-history-plus" target="_blank">
-   <img alt="curseforge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg">
-</a>
-
 # Chat History Plus
 
 A small and simple mod that allows for configurable chat history size.
@@ -23,8 +19,7 @@ If you have any suggestions or issues, please let me know!
 
 ## Downloads
 
-Downloads can be found on [CurseForge](https://curseforge.com/minecraft/mc-mods/chat-history-plus)
-and [Modrinth](https://modrinth.com/mod/chat-history-plus).
+Downloads can be found on [Modrinth](https://modrinth.com/mod/chat-history-plus).
 
 ## License
 

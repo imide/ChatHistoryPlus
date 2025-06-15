@@ -31,7 +31,7 @@ jobs:
             - name: build with gradle
               run: ./gradlew chiseledBuildAndCollect chiseledPublishAndReleaseMods --stacktrace
               env:
-                  CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+#                  CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
                   MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   IMIDE_MAVEN_USER: ${{ secrets.IMIDE_MAVEN_USER }}

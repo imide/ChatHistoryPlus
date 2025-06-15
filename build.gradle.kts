@@ -321,15 +321,15 @@ tasks {
             if (loader.isFabric) requires("fabric-api", "modmenu")
 			requires("yacl")
 		}
-		curseforge {
-			projectId = mod.curseforgeId
-            accessToken = providers.environmentVariable("CURSEFORGE_TOKEN").toString()
-			minecraftVersions.addAll(mc.targets)
-
-            if (loader.isFabric) requires("fabric-api", "modmenu")
-			requires("yacl")
-
-		}
+//		curseforge {
+//			projectId = mod.curseforgeId
+//            accessToken = providers.environmentVariable("CURSEFORGE_TOKEN").toString()
+//			minecraftVersions.addAll(mc.targets)
+//
+//            if (loader.isFabric) requires("fabric-api", "modmenu")
+//			requires("yacl")
+//
+//		}
         github {
             accessToken = providers.environmentVariable("GITHUB_TOKEN")
             repository = "imide/ChatHistoryPlus"
