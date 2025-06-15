@@ -2,14 +2,14 @@
 
 plugins {
     java
+    `java-library`
 
     // Architectury
-    id("dev.architectury.loom") version "1.9.+"
-	id("architectury-plugin") version "3.4-SNAPSHOT"
-	id("io.freefair.lombok") version "8.11"
+    id("dev.architectury.loom") version "1.10.+"
+	id("io.freefair.lombok") version "8.13.1"
 
 	// Indra and spotless
-	id("com.diffplug.spotless") version "7.0.2"
+	id("com.diffplug.spotless") version "7.0.3"
 	id("net.kyori.indra.licenser.spotless") version "3.1.3"
 	id("net.kyori.indra.git") version "3.1.3"
 
@@ -146,13 +146,7 @@ loader.fabric {
         // Mod Menu
         modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
         // YACL
-        // quite annoyingly, puts backwards compatable versions (1.21 and 1.21.1) the LOWER version (but not all the time????)
-        // effected versions: 1.21.1 (1.21), 1.21.3 (1.21.2)
-        when (mc.version) {
-            "1.21.1" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21-${loader.loader}")
-            "1.21.3" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}")
-            else -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
-        }
+        modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
 
         // Fabric API
         modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fapiVersion}")
@@ -171,10 +165,7 @@ loader.fabric {
             modId = mod.id
         }
     }
-
-    tasks {
-
-    }
+    tasks {}
 }
 
 loader.neoforge {
@@ -189,16 +180,10 @@ loader.neoforge {
         "neoForge"("net.neoforged:neoforge:${loader.getVersion()}")
 
         // YACL
-        // quite annoyingly, puts backwards compatable versions (1.21 and 1.21.1) the LOWER version (but not all the time????)
-        // effected versions: 1.21.1 (1.21), 1.21.3 (1.21.2)
-        when (mc.version) {
-            "1.21.1" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21-${loader.loader}")
-            "1.21.3" -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+1.21.2-${loader.loader}")
-            else -> modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
-        }
-    }
+        modImplementation("dev.isxander:yet-another-config-lib:${deps.yaclVersion}+${mc.version}-${loader.loader}")
 
-   tasks {}
+    }
+    tasks {}
 }
 
 java {
@@ -342,9 +327,9 @@ tasks {
            maven {
                name = "imide"
                url = uri("https://maven.imide.xyz/releases")
-               credentials(PasswordCredentials::class)
-               authentication {
-                   create<BasicAuthentication>("basic")
+               credentials {
+                   username = System.getenv("IMIDE_MAVEN_USER") ?: property("IMIDE_MAVEN_USER").toString()
+                   password = System.getenv("IMIDE_MAVEN_PASS") ?: property("IMIDE_MAVEN_PASS").toString()
                }
            }
        }
@@ -353,6 +338,7 @@ tasks {
                groupId = "${mod.group}.${mod.id}"
                artifactId = "${mod.id}-${loader.loader}"
                version = "${mod.version}+${mc.version}"
+
 
            }
        }

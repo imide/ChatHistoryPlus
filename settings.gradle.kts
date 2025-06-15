@@ -10,7 +10,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.5.1"
+    id("dev.kikugie.stonecutter") version "0.6.1"
     id("net.kyori.indra.git") version "3.1.3"
 }
 
@@ -31,8 +31,9 @@ stonecutter {
         mc("1.21.1", listOf("fabric", "neoforge"))
         mc("1.21.3", listOf("fabric", "neoforge"))
         mc("1.21.4", listOf("fabric", "neoforge"))
+        mc("1.21.5", listOf("fabric", "neoforge"))
 
-        vcsVersion = "1.21.4-fabric"
+        vcsVersion = "1.21.5-fabric"
     }
 }
 rootProject.name = "ChatHistoryPlus"

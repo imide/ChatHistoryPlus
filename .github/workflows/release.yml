@@ -1,0 +1,38 @@
+name: Build and release
+on: [ workflow_dispatch ]
+
+jobs:
+    build-and-release:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                java: [ 21 ]
+                os: [ ubuntu-latest ]
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v4
+
+            - name: setup jdk ${{ matrix.java }}
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'temurin'
+                  java-version: ${{ matrix.java }}
+                  cache: gradle
+
+            - name: setup gradle
+              uses: gradle/actions/setup-gradle@v4
+
+            - name: make wrapper executable
+              run: chmod +x ./gradlew
+
+            - name: build with gradle
+              run: ./gradlew chiseledBuildAndCollect --stacktrace
+
+            - name: release with gradle
+              run: ./gradlew chiseledPublishMods --stacktrace
+              env:
+                  CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+                  MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  IMIDE_MAVEN_USER: ${{ secrets.IMIDE_MAVEN_USER }}
+                  IMIDE_MAVEN_PASS: ${{ secrets.IMIDE_MAVEN_PASS }}
