@@ -1,6 +1,9 @@
 name: Build and release
 on: [ workflow_dispatch ]
 
+permissions:
+    contents: write
+
 jobs:
     build-and-release:
         runs-on: ${{ matrix.os }}
@@ -26,14 +29,7 @@ jobs:
               run: chmod +x ./gradlew
 
             - name: build with gradle
-              run: ./gradlew chiseledBuildAndCollect --stacktrace
-              # right now this also needs the maven envs, its annoying. will fix later if i can lool
-              env:
-                  IMIDE_MAVEN_USER: ${{ secrets.IMIDE_MAVEN_USER }}
-                  IMIDE_MAVEN_PASS: ${{ secrets.IMIDE_MAVEN_PASS }}
-
-            - name: release with gradle
-              run: ./gradlew chiseledPublishAndReleaseMods --stacktrace
+              run: ./gradlew chiseledBuildAndCollect chiseledPublishAndReleaseMods --stacktrace
               env:
                   CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
                   MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
