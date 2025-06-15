@@ -332,6 +332,8 @@ tasks {
 		}
         github {
             accessToken = providers.environmentVariable("GITHUB_TOKEN")
+            repository = "imide/ChatHistoryPlus"
+            commitish = "main"
         }
 	}
 
