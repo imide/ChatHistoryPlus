@@ -11,7 +11,7 @@ plugins {
 	// Indra and spotless
 	id("com.diffplug.spotless") version "7.0.3"
 	id("net.kyori.indra.licenser.spotless") version "3.1.3"
-	id("net.kyori.indra.git") version "3.1.3"
+	id("net.kyori.indra.git") version "3.2.0"
 
 	// Publishing
     id("me.modmuss50.mod-publish-plugin") version "0.8.+"
